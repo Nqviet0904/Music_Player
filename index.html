@@ -82,20 +82,15 @@
         const randomBtn = $('.btn-random')
         const repeatBtn = $('.btn-repeat')
         const playlist = $('.playlist')
+        var arrayIndex = [0];
         const app = {
             currentIndex: 0,
             isPlaying: false,
             isRandom: false,
             isRepeat: false,
-            config: JSON.parse(sessionStorage.getItem(PLAYER_STORAGE_KEY)) || {},
+            config: JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)) || {},
             songs: [
-            {
-                    name: "Con cò bé bé",
-                    singer: "Tư Nhú Khùng",
-                    path:
-                        "assset/audio/concobebe.mp3",
-                    image: "assset/img/1.jpg"
-                },
+         
                 {
                     name: "Nơi Tình Yêu Bắt Đầu",
                     singer: "Bùi Anh Tuấn",
@@ -152,7 +147,7 @@
             ],
             setConfig:function(key,value){
                 this.config[key] = value;
-                sessionStorage.setItem(PLAYER_STORAGE_KEY,JSON.stringify(this.config))
+                localStorage.setItem(PLAYER_STORAGE_KEY,JSON.stringify(this.config))
                 
             },
             render: function () {
@@ -262,15 +257,23 @@
                 // Xử Lí bật /tắt Random Song
                 randomBtn.onclick = function () {
                     _this.isRandom = !_this.isRandom
+                     if(_this.isRepeat === true){
+                        _this.isRepeat = !_this.isRepeat;
+                        repeatBtn.classList.remove('active');
+                     }
                      _this.setConfig('isRandom',_this.isRandom)
-                    
+                     _this.setConfig('isRepeat',_this.isRepeat)
                     randomBtn.classList.toggle('active', _this.isRandom);
                 }
                 // Xử lí lặp lại 1 song
                 repeatBtn.onclick  =function(){
                     _this.isRepeat = !_this.isRepeat;
+                    if(_this.isRandom === true){
+                        _this.isRandom= !_this.isRandom;
+                        randomBtn.classList.remove('active');
+                    }
                     _this.setConfig('isRepeat',_this.isRepeat)
-                    
+                    _this.setConfig('isRandom',_this.isRandom)
                     repeatBtn.classList.toggle('active',_this.isRepeat);
                 }
                 // Xử lí next song khi audio ended
@@ -344,9 +347,15 @@
             },
             playRandomSong: function () {
                 let newIndex
+                if(arrayIndex.length === this.songs.length)[
+                    arrayIndex = []
+                ]
                 do {
                     newIndex = Math.floor(Math.random() * this.songs.length)
-                } while (newIndex === this.songs.length)
+                  
+                } while (arrayIndex.includes(newIndex))
+                arrayIndex.push(newIndex);
+                console.log(arrayIndex);
                 this.currentIndex = newIndex;
                 this.loadCurrentSong()
             },
@@ -359,11 +368,26 @@
                 this.handleEvent()
                 // Tải thông tin bài hát đầu tiên vào UI khi chạy ứng dụng
                 this.loadCurrentSong()
+              
                 // Render lại các playlist
                 this.render()
-                // Hiển Thị trạng thái ban đầu của button repeat & random
-                repeatBtn.classList.toggle('active',this.isRepeat);
-                randomBtn.classList.toggle('active', this.isRandom);
+               
+                     // Hiển Thị trạng thái ban đầu của button repeat & random
+                var isconfig = JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)) || null;
+                console.log(isconfig)
+                if(isconfig!=null){
+                    console.log(isconfig)
+                    console.log(!isconfig.isRandom,!isconfig.isRepeat);
+                    if( isconfig.isRandom === true  && isconfig.isRandom !== 'undefined'){
+                        randomBtn.classList.add('active')
+                    }
+                     
+                    if(isconfig.isRepeat === true && isconfig.isRepeat !== 'undefined'){
+                        repeatBtn.classList.add ('active')
+                    }
+                    localStorage.setitem(PLAYER_STORAGE_KEY,JSON.stringify(isconfig));
+                    console.log(this.isconfig)
+                }
             }
 
         }
