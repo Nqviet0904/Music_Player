@@ -88,7 +88,7 @@
             isPlaying: false,
             isRandom: false,
             isRepeat: false,
-            config: JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)) || {},
+            config: JSON.parse(sessionStorage.getItem(PLAYER_STORAGE_KEY)) || {},
             songs: [
          
                 {
@@ -147,7 +147,7 @@
             ],
             setConfig:function(key,value){
                 this.config[key] = value;
-                localStorage.setItem(PLAYER_STORAGE_KEY,JSON.stringify(this.config))
+                sessionStorage.setItem(PLAYER_STORAGE_KEY,JSON.stringify(this.config))
                 
             },
             render: function () {
@@ -219,17 +219,21 @@
                     player.classList.remove('playing')
                 }
 
-                // Khi tiến độ bài hát thay đoi63
+                // Khi tiến độ bài hát thay đổi
                 audio.ontimeupdate = function () {
                     if (audio.duration) {
                         const progressPercent = Math.floor(audio.currentTime / audio.duration * 100)
                         progress.value = progressPercent;
                     }
+                    
                 }
                 // Xử lí khi tua song
                 progress.onchange = function (e) {
+                    
                     const seekTime = audio.duration / 100 * e.target.value;
+                    console.log(seekTime)
                     audio.currentTime = seekTime;
+                    audio.play()    
                 }
                 // Khi next Song
                 nextBtn.onclick = function () {
@@ -373,20 +377,15 @@
                 this.render()
                
                      // Hiển Thị trạng thái ban đầu của button repeat & random
-                var isconfig = JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)) || null;
-                console.log(isconfig)
+                var isconfig = JSON.parse(sessionStorage.getItem(PLAYER_STORAGE_KEY)) || null;
                 if(isconfig!=null){
-                    console.log(isconfig)
-                    console.log(!isconfig.isRandom,!isconfig.isRepeat);
                     if( isconfig.isRandom === true  && isconfig.isRandom !== 'undefined'){
                         randomBtn.classList.add('active')
-                    }
-                     
+                    }             
                     if(isconfig.isRepeat === true && isconfig.isRepeat !== 'undefined'){
                         repeatBtn.classList.add ('active')
                     }
-                    localStorage.setitem(PLAYER_STORAGE_KEY,JSON.stringify(isconfig));
-                    console.log(this.isconfig)
+                    sessionStorage.setItem(PLAYER_STORAGE_KEY,JSON.stringify(isconfig));
                 }
             }
 
